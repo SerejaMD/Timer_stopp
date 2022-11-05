@@ -1,0 +1,161 @@
+from distutils.log import INFO
+from email.policy import default
+from tkinter import *
+from tkinter.messagebox import askyesno
+# from turtle import back  
+from PIL import ImageTk as Image
+# from xml.dom import minidom
+from xml.etree import ElementTree as tree
+import cv2
+from datetime import datetime
+import tempfile
+import os 
+
+
+win = Tk()
+win.geometry('700x700')
+win.maxsize(width=700, height=700)
+win.minsize(width=700, height=700)
+
+width_win = win.winfo_screenmmwidth()
+height_win = win.winfo_screenheight()
+
+General_Frame = Frame(win, width=width_win, height=height_win)#bg='white')
+General_Frame.place(x=0, y=0)
+
+bg = Image.PhotoImage(file="fon6.png")
+back_image = Canvas(General_Frame, width=700, height=700)
+back_image.create_image(350, 350, image=bg)
+back_image.pack()#fill="both", expand=True)
+
+#Размытие фрагментов картинки фона 
+# imag = cv2.imread('fon6.png')
+# new_back = cv2.GaussianBlur(imag, (20, 20), 0)
+# viewImage (imag, "Размытый пёсик")   
+
+path = os.path.abspath(os.path.dirname(__file__))
+path_file = os.path.join(path, 'times.txt')
+
+def write_time():
+    txt = open(path_file, "w")
+    text = (datetime.today().strftime("%Y.%d.%m.%H.%M.%S"))
+    txt.write(text)
+    txt.close()
+    
+#Функции обработчики
+def func_return_words(*arg):
+    pass 
+
+def func_new_date(*arg):
+    pass 
+
+def func_return(*arg):
+    qwest_return_win = askyesno(title="Сдаться ???", message="Вы сдаётесь ???",
+    detail='Цитата', default='no', icon='warning')
+    if qwest_return_win:
+        write_time()
+    else:
+        pass
+    
+
+def func_settings(*arg):
+    pass 
+
+def func_stop(*arg):
+    file_xml = tree.parse('settinge.xml')
+    root_xml = file_xml.getroot()
+    root_xml[0].text = "-"
+    file_xml.write('settinge.xml')
+	
+
+def func_start(*arg):
+    file_xml = tree.parse('settinge.xml')
+    root_xml = file_xml.getroot()
+    root_xml[0].text = "+"
+    file_xml.write('settinge.xml')
+    root()
+
+
+def func_mode(*arg):
+    pass
+
+
+lbl_time = back_image.create_text(350, 200, text="", font=("DS-digital", 40, "bold"), fill="#a9f0d1")
+but_write_time = Button(General_Frame, width=10, height=3, text='write', command=write_time)
+# but_write_time.place(x=300, y=500)
+
+# Кнопки 
+# Одна строчка потом просто подставлять разные иконки ???
+icon_new_date = Image.PhotoImage(file="new_date.png")
+icon_return = Image.PhotoImage(file="return.png")
+icon_settings = Image.PhotoImage(file="settings.png")
+icon_stop = Image.PhotoImage(file="stop.png")
+icon_start = Image.PhotoImage(file="start.png")
+icon_mode = Image.PhotoImage(file="mode.png")
+icon_return_words= Image.PhotoImage(file="return_words.png")
+
+but_return_words = back_image.create_image(50, 630, image=icon_return_words)
+but_new_date = back_image.create_image(150, 630, image=icon_new_date)
+but_return = back_image.create_image(250, 630, image=icon_return)
+but_settings = back_image.create_image(350, 630, image=icon_settings)
+but_stop = back_image.create_image(450, 630, image=icon_stop)
+but_start = back_image.create_image(550, 630, image=icon_start)
+but_mode = back_image.create_image(650, 630, image=icon_mode)
+
+back_image.tag_bind(but_return_words, "<Button-1>", )
+back_image.tag_bind(but_new_date, "<Button-1>")
+back_image.tag_bind(but_return, "<Button-1>", func_return)
+back_image.tag_bind(but_settings, "<Button-1>")
+back_image.tag_bind(but_stop, "<Button-1>", func_stop)
+back_image.tag_bind(but_start, "<Button-1>", func_start )
+back_image.tag_bind(but_mode, "<Button-1>")
+
+# but_new_date = back_image.create_image(400, 300, image=icon1)
+# but = Label(image=icon1)
+# but.place(x=100, y=100)
+
+# file_xml = tree.parse('settinge.xml')
+# root_xml = file_xml.getroot()
+# status = root_xml[0].text
+
+# status = root_xml[0].text
+# status.text = "-"
+# file_xml.write(datafile)
+
+# file_xml = tree.parse('settinge.xml')
+# root_xml = file_xml.getroot()
+# root_xml[0].text = "-"
+# file_xml.write('settinge.xml')
+
+# print(status)
+
+# write_time()
+def root():
+    while True:
+        file_xml = tree.parse('settinge.xml')
+        root_xml = file_xml.getroot()
+        status = root_xml[0].text
+
+        if status == "+":
+            with open(path_file) as txt:
+                old_time_txt = txt.readline()
+                old_time = datetime.strptime(old_time_txt, '%Y.%d.%m.%H.%M.%S')
+                real_time = datetime.today().replace(microsecond=0)
+                z = real_time - old_time
+                z = str(z)
+                try:
+                    back_image.itemconfigure(lbl_time, text=z)
+                    back_image.update()
+                except:
+                    break
+        elif status == '-':
+            lbl_time
+            break
+
+        else:
+            pass
+
+root()
+
+
+win.mainloop()
